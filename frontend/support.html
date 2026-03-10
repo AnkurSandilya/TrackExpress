@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Support • TrackExpress</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="icon" type="image/jpg" href="favicon.jpg">
+
+
+<style>
+body {
+  background: linear-gradient(135deg, #f3f4f6, #e0f2fe);
+}
+
+/* MAIN CARD */
+.support-container {
+  max-width: 950px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 700;
+}
+
+/* FAQ GRID */
+.faq {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.faq-item {
+  background: #f9fafb;
+  padding: 18px;
+  border-radius: 12px;
+  border-left: 5px solid #ff3b3b;
+}
+
+.faq-item strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.faq-item p {
+  color: #555;
+  font-size: 14px;
+}
+
+/* CHATBOT */
+.chatbot {
+  margin-top: 40px;
+}
+
+.chatbox {
+  height: 320px;
+  border-radius: 14px;
+  padding: 18px;
+  overflow-y: auto;
+  background: #f1f5f9;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.msg {
+  display: flex;
+  margin: 12px 0;
+}
+
+.msg.user {
+  justify-content: flex-end;
+}
+
+.msg span {
+  padding: 10px 14px;
+  border-radius: 18px;
+  max-width: 70%;
+  font-size: 14px;
+}
+
+.user span {
+  background: #ff3b3b;
+  color: #fff;
+}
+
+.bot span {
+  background: #e2e8f0;
+  color: #000;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 12px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 14px 20px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .faq {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">TrackExpress</div>
+  <ul class="nav-links">
+    <li><a href="booking.html">Manage Booking</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="support.html">Support</a></li>
+  </ul>
+</nav>
+
+<div class="support-container">
+  <h2>Delivery Help & Support</h2>
+
+  <!-- DELIVERY FAQs -->
+  <div class="faq">
+    <div class="faq-item">
+      <strong>Why is my delivery delayed?</strong>
+      <p>Delays can occur due to weather, route congestion, or high parcel volume at transit hubs.</p>
+    </div>
+
+    <div class="faq-item">
+      <strong>What does "In Transit" mean?</strong>
+      <p>Your parcel is currently moving between cities or logistics hubs towards the destination.</p>
+    </div>
+
+    <div class="faq-item">
+      <strong>What does "Out for Delivery" indicate?</strong>
+      <p>The parcel is with the delivery agent and will be delivered soon.</p>
+    </div>
+
+    <div class="faq-item">
+      <strong>Can I change delivery address?</strong>
+      <p>Address changes are only allowed before dispatch. After that, changes may not be possible.</p>
+    </div>
+
+    <div class="faq-item">
+      <strong>Tracking status not updating?</strong>
+      <p>Status updates pause when parcels travel between hubs. Please check again later.</p>
+    </div>
+
+    <div class="faq-item">
+      <strong>Estimated delivery time?</strong>
+      <p>It depends on distance, package weight, and transit routing.</p>
+    </div>
+  </div>
+
+  <!-- SMART CHATBOT -->
+  <div class="chatbot">
+    <h3 style="margin-bottom:10px;">Ask Delivery Assistant</h3>
+
+    <div class="chatbox" id="chatbox">
+      <div class="msg bot"><span>Hello! Please enter your Tracking ID (e.g., TX1001) and your issue.</span></div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Example: Delay in delivery for TX1001">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let awaitingTrackingId = false;
+let userIssue = "";
+
+function addMessage(text, sender) {
+  const chatbox = document.getElementById("chatbox");
+  const msgDiv = document.createElement("div");
+  msgDiv.className = "msg " + sender;
+  msgDiv.innerHTML = `<span>${text}</span>`;
+  chatbox.appendChild(msgDiv);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function extractTrackingId(text) {
+  const match = text.match(/TX\d{4}/i);
+  return match ? match[0].toUpperCase() : null;
+}
+
+function generateReason(issue, trackingId) {
+  const msg = issue.toLowerCase();
+
+  if (msg.includes("delay") || msg.includes("late")) {
+    return `Parcel ${trackingId} may be delayed due to transit hub congestion, route distance, or weather conditions. Please track it for the latest movement updates.`;
+  }
+
+  if (msg.includes("not delivered") || msg.includes("not received")) {
+    return `For ${trackingId}, if status shows delivered but not received, please check with neighbors or security and then contact support with this tracking ID.`;
+  }
+
+  if (msg.includes("delivery time") || msg.includes("when")) {
+    return `Estimated delivery time for ${trackingId} depends on distance, package weight, and routing through transit hubs.`;
+  }
+
+  if (msg.includes("address")) {
+    return `Address change for ${trackingId} is only possible before dispatch. If parcel is already in transit, modification may not be allowed.`;
+  }
+
+  return `For parcel ${trackingId}, please track the shipment to view current location and status updates.`;
+}
+
+function botReply(input) {
+  const trackingId = extractTrackingId(input);
+
+  // Step 1: User asked issue, bot asks for tracking ID
+  if (!awaitingTrackingId) {
+    userIssue = input;
+    awaitingTrackingId = true;
+    return "Sure, I can help with that. Could you please provide your Tracking ID (e.g., TX1001)?";
+  }
+
+  // Step 2: User provides tracking ID
+  if (awaitingTrackingId && trackingId) {
+    awaitingTrackingId = false;
+    const response = generateReason(userIssue, trackingId);
+    userIssue = "";
+    return response;
+  }
+
+  // Step 3: User didn’t provide valid tracking ID
+  return "Please provide a valid Tracking ID like TX1001 so I can check your delivery issue.";
+}
+
+function sendMessage() {
+  const inputField = document.getElementById("userInput");
+  const text = inputField.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+
+  const reply = botReply(text);
+  setTimeout(() => addMessage(reply, "bot"), 500);
+
+  inputField.value = "";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manage Booking • TrackExpress</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="icon" type="image/jpg" href="favicon.jpg">
+
+
+<style>
+.container {
+  max-width: 750px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.container input, button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+button {
+  background: #ff3b3b;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Orange after success */
+button.success {
+  background: orange;
+}
+
+.view-btn {
+  background: green;
+}
+
+.delete-btn {
+  background: red;
+  padding: 6px 12px;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+/* Hidden until button clicked */
+#bookingSection {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">TrackExpress</div>
+  <ul class="nav-links">
+    <li><a href="booking.html">Manage Booking</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="support.html">Support</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <h2>Create Booking</h2>
+
+  <!-- Correct Order -->
+  <input type="text" id="sender" placeholder="Sender Name">
+  <input type="text" id="receiver" placeholder="Receiver Name">
+  <input list="cities" id="origin" placeholder="Origin City">
+  <input list="cities" id="destination" placeholder="Destination City">
+  <input type="number" id="weight" placeholder="Enter weight in KG">
+
+  <button id="createBtn" onclick="createBooking()">Create Booking</button>
+
+  <hr>
+
+  <button class="view-btn" onclick="showBookings()">View My Bookings</button>
+
+  <!-- BOOKINGS TABLE -->
+  <div id="bookingSection">
+    <h3>Your Bookings</h3>
+    <table id="bookingTable">
+      <thead>
+        <tr>
+          <th>Tracking ID</th>
+          <th>Route</th>
+          <th>Status</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <p id="msg"></p>
+</div>
+
+<datalist id="cities">
+<option value="Delhi">
+<option value="Mumbai">
+<option value="Bangalore">
+<option value="Hyderabad">
+<option value="Chennai">
+<option value="Kolkata">
+<option value="Patna">
+<option value="Jaipur">
+<option value="Lucknow">
+<option value="Pune">
+<option value="Ahmedabad">
+<option value="Nagpur">
+<option value="Chandigarh">
+<option value="Indore">
+</datalist>
+
+<script>
+async function createBooking() {
+  const btn = document.getElementById("createBtn");
+
+  const senderName = document.getElementById("sender").value.trim();
+  const receiverName = document.getElementById("receiver").value.trim();
+  const originCity = document.getElementById("origin").value.trim();
+  const destinationCity = document.getElementById("destination").value.trim();
+  const weight = document.getElementById("weight").value.trim();
+
+  if (!senderName || !receiverName || !originCity || !destinationCity || !weight) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/booking/create", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      senderName,
+      receiverName,
+      originCity,
+      destinationCity,
+      weight
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    btn.classList.add("success");
+    btn.innerText = "Booking Created ✔";
+    document.getElementById("msg").innerText = "Tracking ID: " + data.trackingId;
+
+    // Reset form
+    document.getElementById("sender").value = "";
+    document.getElementById("receiver").value = "";
+    document.getElementById("origin").value = "";
+    document.getElementById("destination").value = "";
+    document.getElementById("weight").value = "";
+
+  } else {
+    alert(data.message);
+  }
+}
+
+function showBookings() {
+  document.getElementById("bookingSection").style.display = "block";
+  loadBookings();
+}
+
+async function loadBookings() {
+  const res = await fetch("http://localhost:5000/booking/all");
+  const data = await res.json();
+
+  const tbody = document.querySelector("#bookingTable tbody");
+  tbody.innerHTML = "";
+
+  if (!data.success || !data.parcels.length) {
+    tbody.innerHTML = `<tr><td colspan="4">No bookings found</td></tr>`;
+    return;
+  }
+
+  data.parcels.forEach(p => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.trackingId}</td>
+        <td>${p.originCity} → ${p.destinationCity}</td>
+        <td>${p.status}</td>
+        <td>
+          <button class="delete-btn" onclick="deleteBooking('${p.trackingId}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function deleteBooking(id) {
+  const confirmDelete = confirm("Are you sure you want to delete this booking?");
+  if (!confirmDelete) return;
+
+  const res = await fetch("http://localhost:5000/booking/cancel", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ trackingId: id })
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert(data.message); // shows restriction reason
+    return;
+  }
+
+  loadBookings();
+}
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <title>Parcel Tracking</title>
+  <link rel="icon" type="image/jpg" href="favicon.jpg">
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ===== Progress Bar ===== */
+    .progress-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-container::before {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #ddd;
+      z-index: 0;
+    }
+
+    .progress-step {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      flex: 1;
+    }
+
+    .circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ddd;
+      color: white;
+      line-height: 40px;
+      margin: auto;
+      font-weight: bold;
+    }
+
+    .active .circle {
+      background: #28a745;
+    }
+
+    .label {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">TrackExpress</div>
+  <ul class="nav-links">
+    <li><a href="booking.html">Manage Booking</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="support.html">Support</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+
+  <!-- LEFT -->
+  <div class="hero-text">
+    <h1>PARCEL TRACKING <br><span>SYSTEM</span></h1>
+    <p>Fast, secure and real-time courier tracking at your fingertips.</p>
+
+    <div class="track-box">
+      <input type="text" id="tracking" placeholder="Enter Tracking ID">
+      <button onclick="trackParcel()">Track Now</button>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result" id="result" style="display:none;">
+      <h3 id="status"></h3>
+      <p id="date"></p>
+      <p id="location"></p>
+
+      <!-- ===== PROGRESS BAR ===== -->
+      <div class="progress-container">
+        <div class="progress-step" id="step-booked">
+          <div class="circle">1</div>
+          <div class="label">Booked</div>
+        </div>
+        <div class="progress-step" id="step-transit">
+          <div class="circle">2</div>
+          <div class="label">In Transit</div>
+        </div>
+        <div class="progress-step" id="step-out">
+          <div class="circle">3</div>
+          <div class="label">Out for Delivery</div>
+        </div>
+        <div class="progress-step" id="step-delivered">
+          <div class="circle">4</div>
+          <div class="label">Delivered</div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div id="timeline"></div>
+
+      <!-- Map -->
+      <div id="map" style="height:300px; margin-top:15px;"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT IMAGE -->
+  <div class="hero-image">
+    <img src="https://static.vecteezy.com/system/resources/previews/023/743/919/non_2x/courier-delivery-man-holding-parcel-box-with-mobile-phone-fast-online-delivery-service-online-ordering-internet-e-commerce-ideas-for-websites-or-banners-3d-perspective-illustration-free-png.png" alt="Delivery">
+  </div>
+
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const user = localStorage.getItem("user");
+if (!user) window.location.href = "auth.html";
+
+let map;
+let markers = [];
+let autoRefreshInterval = null;
+let lastStatus = "";
+let lastLocation = "";
+
+async function trackParcel() {
+  const id = document.getElementById("tracking").value.trim();
+  if (!id) return alert("Enter tracking ID");
+
+  try {
+    const res = await fetch(`http://localhost:5000/track/${id}`);
+    const data = await res.json();
+    if (!data.success) return alert(data.message);
+
+    const parcel = data.parcel;
+
+    // Live change detection
+    if (lastLocation && lastLocation !== parcel.currentLocation) {
+      alert(`Parcel reached ${parcel.currentLocation}`);
+    }
+    if (lastStatus && lastStatus !== parcel.status) {
+      alert(`Status updated: ${parcel.status}`);
+    }
+    lastStatus = parcel.status;
+    lastLocation = parcel.currentLocation;
+
+    // Basic info
+    document.getElementById("status").innerText = parcel.status;
+    document.getElementById("date").innerText =
+      "Expected Delivery: " + parcel.expectedDeliveryDate;
+    document.getElementById("location").innerText =
+      "Current Location: " + parcel.currentLocation;
+
+    // ===== Progress Bar Update =====
+    const steps = {
+      "Booked": 1,
+      "In Transit": 2,
+      "Out for Delivery": 3,
+      "Delivered": 4
+    };
+    const currentStep = steps[parcel.status] || 1;
+
+    ["step-booked","step-transit","step-out","step-delivered"].forEach((id, index) => {
+      const el = document.getElementById(id);
+      if (index < currentStep) el.classList.add("active");
+      else el.classList.remove("active");
+    });
+
+    // Timeline
+    document.getElementById("timeline").innerHTML = `
+      <h4>Movement History</h4>
+      <ul>
+        ${parcel.history
+          .map(h => `<li><strong>${h.location}</strong> - ${h.status} (${h.time})</li>`)
+          .join("")}
+      </ul>
+    `;
+
+    document.getElementById("result").style.display = "block";
+
+    // ===== MAP ROUTE =====
+    const cityCoords = {
+      "Chennai": [13.0827, 80.2707],
+      "Bangalore": [12.9716, 77.5946],
+      "Hyderabad": [17.3850, 78.4867],
+      "Delhi": [28.6139, 77.2090],
+      "Mumbai": [19.0760, 72.8777],
+      "Kolkata": [22.5726, 88.3639],
+      "Nagpur": [21.1458, 79.0882],
+      "Patna": [25.5941, 85.1376]
+    };
+
+    const routeCities = [
+      parcel.originCity,
+      ...parcel.transitHubs,
+      parcel.destinationCity
+    ];
+
+    const routeCoords = routeCities.map(c => cityCoords[c]).filter(Boolean);
+
+    if (map) map.remove();
+
+    map = L.map("map").setView(routeCoords[0], 5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    L.polyline(routeCoords, { color: "red", weight: 4 }).addTo(map);
+    map.fitBounds(routeCoords);
+
+    // Clear old markers
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    // Icons: Green (origin), Yellow (hubs), Red (destination)
+    const originIcon = L.icon({
+      iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+      iconSize: [32, 32]
+    });
+
+    const hubIcon = L.icon({
+      iconUrl: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+      iconSize: [32, 32]
+    });
+
+    const destIcon = L.icon({
+      iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+      iconSize: [32, 32]
+    });
+
+    // Origin
+    if (cityCoords[parcel.originCity]) {
+      markers.push(
+        L.marker(cityCoords[parcel.originCity], { icon: originIcon })
+          .addTo(map)
+          .bindPopup("Origin: " + parcel.originCity)
+      );
+    }
+
+    // Transit hubs
+    parcel.transitHubs.forEach(hub => {
+      if (cityCoords[hub]) {
+        markers.push(
+          L.marker(cityCoords[hub], { icon: hubIcon })
+            .addTo(map)
+            .bindPopup("Transit Hub: " + hub)
+        );
+      }
+    });
+
+    // Destination
+    if (cityCoords[parcel.destinationCity]) {
+      markers.push(
+        L.marker(cityCoords[parcel.destinationCity], { icon: destIcon })
+          .addTo(map)
+          .bindPopup("Destination: " + parcel.destinationCity)
+      );
+    }
+
+    // Auto refresh every 5 sec
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    autoRefreshInterval = setInterval(() => trackParcel(), 5000);
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+}
+</script>
+
+</body>
+</html>

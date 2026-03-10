@@ -1,0 +1,152 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===== BODY ===== */
+body {
+  background: #ffffff;
+  color: #111;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 8%;
+  background: #000;
+}
+
+.logo {
+  font-family: "Orbitron", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff2d2d;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #ff2d2d;
+}
+
+/* ===== HERO ===== */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 8%;
+  flex-wrap: wrap;
+}
+
+/* LEFT TEXT */
+.hero-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-text h1 {
+  font-family: "Poppins", sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  line-height: 1.15;
+}
+
+.hero-text span {
+  color: #ff2d2d;
+}
+
+.hero-text p {
+  margin-bottom: 25px;
+  color: #555;
+}
+
+/* TRACK BOX */
+.track-box {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.track-box input {
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 220px;
+}
+
+.track-box button {
+  padding: 14px 22px;
+  background: #ff2d2d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.track-box button:hover {
+  background: #d91c1c;
+}
+
+/* RESULT */
+.result {
+  display: none;
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ff2d2d;
+  border-radius: 10px;
+  max-width: 320px;
+}
+
+/* RIGHT IMAGE */
+.hero-image {
+  flex: 1;
+  text-align: center;
+  min-width: 300px;
+}
+
+.hero-image img {
+  max-width: 420px;
+  width: 100%;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+
+  .hero-text h1 {
+    font-size: 38px;
+  }
+
+  .hero-image img {
+    max-width: 280px;
+    margin-bottom: 30px;
+  }
+}

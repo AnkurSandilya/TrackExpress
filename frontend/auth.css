@@ -1,0 +1,162 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+/* BACKGROUND */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc, #eef2f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* PAGE WIDTH */
+.page {
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.brand {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.header-img {
+  height: 60px;
+  border-radius: 8px;
+}
+
+/* CARD */
+.card {
+  width: 380px;
+  background: #ffffff;
+  padding: 36px;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  margin: 0 auto;
+}
+
+/* TITLES */
+.card h2 {
+  font-size: 22px;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 22px;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 13px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.15);
+}
+
+/* BUTTONS */
+button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* PRIMARY */
+.primary {
+  background: #ef4444;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.primary:hover {
+  background: #dc2626;
+}
+
+/* SECONDARY */
+.secondary {
+  background: #111827;
+  color: #fff;
+  margin-top: 6px;
+}
+
+.secondary:hover {
+  background: #000;
+}
+
+/* MESSAGE */
+.msg {
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 16px;
+  color: #ef4444;
+}
+
+/* SWITCH */
+.switch {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 18px;
+}
+
+.switch span {
+  color: #ef4444;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* REGISTER HIDDEN */
+.register {
+  max-height: 0;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
+
+.register.show {
+  max-height: 200px;
+  margin-top: 16px;
+}
+
+/* MOBILE */
+@media (max-width: 500px) {
+  .card {
+    width: 100%;
+    padding: 28px;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+}

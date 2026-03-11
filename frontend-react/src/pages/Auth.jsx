@@ -72,42 +72,77 @@ function Auth() {
 
   return (
     <div className="page">
+      <div className="route-line one"></div>
+      <div className="route-line two"></div>
+      <div className="route-line three"></div>
+
       <div className="header">
-        <h1 className="brand">TrackExpress</h1>
+        <div className="header-badge">Logistics SaaS Platform</div>
+        <h1 className="brand">
+          Track<span>Express</span>
+        </h1>
         <p className="header-tagline">
-          Smart parcel booking, live tracking, and delivery support — all in one
-          powerful and beautiful experience.
+          Powerful parcel booking, live shipment visibility, and delivery support
+          designed for a modern logistics workflow.
         </p>
-        <img
-          src="https://img.freepik.com/free-vector/people-vector_53876-17373.jpg"
-          className="header-img"
-          alt="header"
-        />
+
+        <div className="header-points">
+          <div className="point-card">
+            <h4>Live Tracking</h4>
+            <p>Monitor parcel movement, status changes, and destination progress in real time.</p>
+          </div>
+          <div className="point-card">
+            <h4>Smart Booking</h4>
+            <p>Create shipments quickly with route details, sender information, and delivery flow.</p>
+          </div>
+          <div className="point-card">
+            <h4>Reliable Support</h4>
+            <p>Give users instant clarity on delays, delivery stages, and common shipment issues.</p>
+          </div>
+        </div>
+
+        <div className="header-img-wrap">
+          <img
+            src="https://media.istockphoto.com/id/1133999388/photo/delivery-man-with-a-parcel-box-in-the-car-stock-image-save.jpg?s=612x612&w=0&k=20&c=RqdZ4502uEdAqGlngSrgANzNNPb2gzbzUnm75osAio0="
+            className="header-img"
+            alt="TrackExpress logistics"
+          />
+        </div>
       </div>
 
       <div className="card">
         {!isRegister ? (
           <div>
-            
+            <div className="card-badge">Secure Access</div>
             <h2>Welcome back</h2>
-            <p className="subtitle">Log in to continue tracking your parcels</p>
+            <p className="subtitle">
+              Sign in to access your tracking dashboard and manage shipments.
+            </p>
 
-            <input
-              type="text"
-              placeholder="User ID"
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={loginPass}
-              onChange={(e) => setLoginPass(e.target.value)}
-            />
+            <div className="field-group">
+              <label className="field-label">User ID</label>
+              <input
+                type="text"
+                placeholder="Enter your user ID"
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
+              />
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">Password</label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={loginPass}
+                onChange={(e) => setLoginPass(e.target.value)}
+              />
+            </div>
 
             <button className="primary" onClick={login}>
               Continue
             </button>
+
             <p className="msg">{loginMsg}</p>
 
             <p className="switch">
@@ -117,26 +152,36 @@ function Auth() {
           </div>
         ) : (
           <div>
-            
-            <h2>Create Account</h2>
-            <p className="subtitle">Sign up to start tracking parcels</p>
+            <div className="card-badge">Create Account</div>
+            <h2>Join TrackExpress</h2>
+            <p className="subtitle">
+              Register to start booking, tracking, and managing parcels.
+            </p>
 
-            <input
-              type="text"
-              placeholder="Create User ID"
-              value={regId}
-              onChange={(e) => setRegId(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Create Password"
-              value={regPass}
-              onChange={(e) => setRegPass(e.target.value)}
-            />
+            <div className="field-group">
+              <label className="field-label">User ID</label>
+              <input
+                type="text"
+                placeholder="Create your user ID"
+                value={regId}
+                onChange={(e) => setRegId(e.target.value)}
+              />
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">Password</label>
+              <input
+                type="password"
+                placeholder="Create your password"
+                value={regPass}
+                onChange={(e) => setRegPass(e.target.value)}
+              />
+            </div>
 
             <button className="secondary" onClick={register}>
               Create Account
             </button>
+
             <p className="msg">{regMsg}</p>
 
             <p className="switch">

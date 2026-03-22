@@ -43,7 +43,7 @@ function Booking() {
 
   const loadBookings = async () => {
     try {
-      const res = await fetch("http://localhost:5000/booking/all");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/booking/all`);
       const data = await res.json();
 
       if (data.success && Array.isArray(data.bookings)) {

@@ -46,7 +46,7 @@ function Payment() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/booking/create", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/booking/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

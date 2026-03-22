@@ -1,218 +1,123 @@
-\# Parcel Tracking System
+# 🚚 TrackExpress – Parcel Tracking System
 
+## 📌 Overview
 
-
-A simple full-stack web application where users can book parcels and track their delivery status.  
-
-Includes an admin panel to manage parcels.
-
-
+TrackExpress is a full-stack web application that allows users to book parcels, track delivery status, and manage shipments.
+It also includes an Admin Panel to manage parcels and update delivery status.
 
 ---
 
+## 🛠 Tech Stack
 
+### Frontend
 
-\## Tech Stack
+* React.js
+* Vite
+* CSS
 
+### Backend
 
+* Node.js
+* Express.js
 
-Frontend:
+### Database
 
-\- HTML
-
-\- CSS
-
-\- JavaScript
-
-
-
-Backend:
-
-\- Node.js
-
-\- Express.js
-
-
-
-Database:
-
-\- MongoDB
-
-
+* MongoDB
 
 ---
 
+## ✨ Features
 
-
-\## Project Structure
-
-
-
-parcel-tracking-system/
-
-
-
-backend/
-
-\- server.js
-
-\- models/
-
-\- package.json
-
-
-
-frontend/
-
-\- index.html
-
-\- booking.html
-
-\- admin.html
-
-\- auth.html
-
-\- style.css
-
-
+* User Authentication (Login / Register)
+* Parcel Booking System
+* Parcel Tracking using Tracking ID
+* Admin Dashboard for parcel management
+* Parcel Status Updates
 
 ---
 
+## 📂 Project Structure
 
-
-\## Setup Instructions
-
-
-
-\### 1. Clone the Repository
-
-
-
-git clone https://github.com/AnkurSandilya/parcel-tracking-system.git
-
-
-
-cd parcel-tracking-system
-
-
+```
+TrackExpress/
+│
+├── backend/        # Backend (API & database)
+├── frontend/       # Frontend (React UI)
+│
+├── README.md
+└── .gitignore
+```
 
 ---
 
+## ⚙️ Setup Instructions
 
+### 1. Clone the Repository
 
-\### 2. Install Backend Dependencies
+```bash
+git clone https://github.com/AnkurSandilya/TrackExpress.git
+cd TrackExpress
+```
 
+---
 
+### 2. Backend Setup
 
+```bash
 cd backend
-
-
-
 npm install
-
-
-
----
-
-
-
-\### 3. Setup MongoDB Connection
-
-
-
-Create a file inside the \*\*backend folder\*\* called:
-
-
-
-.env
-
-
-
-Add your MongoDB connection string:
-
-
-
-MONGO\_URI=your\_mongodb\_connection\_string
-
-
-
-Example:
-
-
-
-MONGO\_URI=mongodb+srv://username:password@cluster.mongodb.net/parcelDB
-
-
+npm start
+```
 
 ---
 
+### 3. Frontend Setup
 
-
-\### 4. Start the Backend Server
-
-
-
-node server.js
-
-
-
-Server will run on:
-
-
-
-http://localhost:5000
-
-
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
+## 🔐 Environment Variables
 
+Create a `.env` file inside the backend folder:
 
-\### 5. Run the Frontend
-
-
-
-Go to the \*\*frontend folder\*\* and open:
-
-
-
-index.html
-
-
-
-in your browser.
-
-
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
 
 ---
 
+## 🌐 API Endpoints (Basic)
 
-
-\## Important Notes
-
-
-
-\- Each developer should use their \*\*own MongoDB connection string\*\*.
-
-\- Do NOT upload `.env` file to GitHub.
-
-\- `.gitignore` already prevents this.
-
-
+* POST /api/auth/login
+* POST /api/auth/register
+* POST /api/parcel/book
+* GET /api/parcel/:id
 
 ---
 
+## 🚀 Future Improvements
+
+* Live parcel tracking (real-time updates)
+* Payment integration
+* Email/SMS notifications
+* Improved UI/UX
 
 
-\## Features
+## 👨‍💻 Authors
 
+Ankur Kumar
+Saurav Mishra
+Vivek Raj
 
+---
 
-\- User authentication
+## ⭐ If you like this project
 
-\- Parcel booking
-
-\- Parcel tracking
-
-\- Admin dashboard
-
+Give it a star on GitHub ⭐

@@ -112,8 +112,8 @@ JWT_SECRET=your_secret_key
 
 ## 👨‍💻 Authors
 
-Ankur Kumar
-Saurav Mishra
+Ankur Kumar ,
+Saurav Mishra ,
 Vivek Raj
 
 ---

@@ -8,7 +8,32 @@ const Parcel = require("./models/Parcel");
 
 const app = express();
 
-app.use(cors());
+// ================= CORS =================
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://trackexpress-steel.vercel.app",
+  "https://trackexpress-j6t83r1g0-ankur091204-7873s-projects.vercel.app",
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin like Postman/mobile apps
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -51,7 +76,7 @@ app.post("/signup", async (req, res) => {
 
     res.json({ success: true, message: "Registration successful" });
   } catch (err) {
-    console.error(err);
+    console.error("Signup error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -77,7 +102,7 @@ app.post("/login", async (req, res) => {
 
     res.json({ success: true, message: "Login successful" });
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -93,7 +118,7 @@ app.get("/track/:trackingId", async (req, res) => {
 
     res.json({ success: true, parcel });
   } catch (err) {
-    console.error(err);
+    console.error("Track error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -151,7 +176,7 @@ app.post("/booking/create", async (req, res) => {
       trackingId,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Booking create error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -166,7 +191,7 @@ app.get("/booking/all", async (req, res) => {
       bookings,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Booking all error:", err);
     res.json({
       success: false,
       message: "Failed to load bookings",
@@ -200,7 +225,7 @@ app.post("/booking/cancel", async (req, res) => {
 
     res.json({ success: true, message: "Booking cancelled successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Booking cancel error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -230,7 +255,7 @@ app.post("/admin/add-parcel", async (req, res) => {
 
     res.json({ success: true, message: "Parcel added successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Admin add parcel error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
@@ -258,7 +283,7 @@ app.post("/admin/update-status", async (req, res) => {
 
     res.json({ success: true, message: "Status updated successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Update status error:", err);
     res.json({ success: false, message: "Server error" });
   }
 });
@@ -273,7 +298,7 @@ app.get("/admin/parcels", async (req, res) => {
       parcels,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Get parcels error:", err);
     res.json({
       success: false,
       message: "Server error",

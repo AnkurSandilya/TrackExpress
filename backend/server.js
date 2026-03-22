@@ -3,25 +3,30 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const User = require("./models/User");
+const Parcel = require("./models/Parcel");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ================= DATABASE CONNECTION =================
 mongoose
-  .connect("mongodb://127.0.0.1:27017/trackexpress")
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err.message);
+  });
 
-const User = require("./models/User");
-const Parcel = require("./models/Parcel");
-
+// ================= HELPER =================
 function generateTrackingId() {
   const num = Math.floor(1000 + Math.random() * 9000);
   return "TX" + num;
 }
 
+// ================= ROOT =================
 app.get("/", (req, res) => {
   res.send("TrackExpress Backend Running");
 });
@@ -55,6 +60,10 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
+
+    if (!userId || !password) {
+      return res.json({ success: false, message: "All fields required" });
+    }
 
     const user = await User.findOne({ userId });
 
@@ -92,9 +101,13 @@ app.get("/track/:trackingId", async (req, res) => {
 // ================= CREATE BOOKING =================
 app.post("/booking/create", async (req, res) => {
   try {
-    const { senderName, receiverName, originCity, destinationCity, weight } = req.body;
-
-    console.log("BOOKING BODY:", req.body);
+    const {
+      senderName,
+      receiverName,
+      originCity,
+      destinationCity,
+      weight,
+    } = req.body;
 
     if (
       !senderName?.trim() ||
@@ -201,10 +214,15 @@ app.post("/admin/add-parcel", async (req, res) => {
       return res.json({ success: false, message: "Tracking ID required" });
     }
 
-    const existing = await Parcel.findOne({ trackingId: parcelData.trackingId });
+    const existing = await Parcel.findOne({
+      trackingId: parcelData.trackingId,
+    });
 
     if (existing) {
-      return res.json({ success: false, message: "Tracking ID already exists" });
+      return res.json({
+        success: false,
+        message: "Tracking ID already exists",
+      });
     }
 
     const parcel = new Parcel(parcelData);
@@ -221,6 +239,10 @@ app.post("/admin/add-parcel", async (req, res) => {
 app.post("/admin/update-status", async (req, res) => {
   try {
     const { trackingId, location, status, time } = req.body;
+
+    if (!trackingId || !location || !status || !time) {
+      return res.json({ success: false, message: "All fields required" });
+    }
 
     const parcel = await Parcel.findOne({ trackingId });
 
@@ -259,7 +281,9 @@ app.get("/admin/parcels", async (req, res) => {
   }
 });
 
-const PORT = 5000;
+// ================= START SERVER =================
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

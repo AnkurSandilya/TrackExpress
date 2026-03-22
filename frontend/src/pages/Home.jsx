@@ -132,7 +132,7 @@ function Home() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/track/${id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/track/${id}`);
       const data = await res.json();
 
       if (!data.success) {

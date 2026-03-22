@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 function Booking() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     senderName: "",
     receiverName: "",
@@ -95,39 +98,7 @@ function Booking() {
       return;
     }
 
-    try {
-      const res = await fetch("http://localhost:5000/booking/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        alert(`Booking created. Tracking ID: ${data.trackingId}`);
-
-        setForm({
-          senderName: "",
-          receiverName: "",
-          originCity: "",
-          destinationCity: "",
-          weight: "",
-        });
-
-        setOriginSuggestions([]);
-        setDestinationSuggestions([]);
-
-        await loadBookings();
-      } else {
-        alert(data.message || "Booking failed");
-      }
-    } catch (error) {
-      console.error("Booking create error:", error);
-      alert("Server not connected");
-    }
+    navigate("/payment", { state: payload });
   };
 
   const safeOriginSuggestions = Array.isArray(originSuggestions)

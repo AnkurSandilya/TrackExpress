@@ -20,13 +20,9 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin like Postman/mobile apps
       if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.log("Blocked origin:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -44,6 +40,13 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
   });
+
+// ================= TWILIO SETUP =================
+const twilio = require("twilio");
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 // ================= HELPER =================
 function generateTrackingId() {
@@ -123,6 +126,35 @@ app.get("/track/:trackingId", async (req, res) => {
   }
 });
 
+// ================= SEND SMS NOTIFICATION =================
+app.post("/notify-sms", async (req, res) => {
+  try {
+    const { phone, trackingId, status, location } = req.body;
+
+    if (!phone || !trackingId || !status || !location) {
+      return res.json({ success: false, message: "All fields required" });
+    }
+
+    const message =
+      `TrackExpress Update 📦\n` +
+      `Tracking ID: ${trackingId}\n` +
+      `Status: ${status}\n` +
+      `Current Location: ${location}\n\n` +
+      `Track your parcel at: https://trackexpress-steel.vercel.app`;
+
+    await twilioClient.messages.create({
+      body: message,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phone,
+    });
+
+    res.json({ success: true, message: "SMS sent successfully" });
+  } catch (err) {
+    console.error("SMS error:", err.message);
+    res.json({ success: false, message: "Failed to send SMS: " + err.message });
+  }
+});
+
 // ================= CREATE BOOKING =================
 app.post("/booking/create", async (req, res) => {
   try {
@@ -196,6 +228,31 @@ app.get("/booking/all", async (req, res) => {
       success: false,
       message: "Failed to load bookings",
     });
+  }
+});
+
+// ================= DELETE BOOKING =================
+app.delete("/booking/:id", async (req, res) => {
+  try {
+    const parcel = await Parcel.findById(req.params.id);
+
+    if (!parcel) {
+      return res.json({ success: false, message: "Booking not found" });
+    }
+
+    if (parcel.status === "Delivered" || parcel.status === "Out for Delivery") {
+      return res.json({
+        success: false,
+        message: "Cannot delete this booking",
+      });
+    }
+
+    await Parcel.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true, message: "Booking deleted successfully" });
+  } catch (err) {
+    console.error("Delete booking error:", err);
+    res.json({ success: false, message: "Server error" });
   }
 });
 

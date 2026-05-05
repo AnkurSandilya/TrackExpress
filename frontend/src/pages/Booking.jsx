@@ -78,6 +78,29 @@ function Booking() {
     setDestinationSuggestions(filterCities(value));
   };
 
+  // ================= DELETE HANDLER =================
+  const handleDelete = async (id, status) => {
+    if (status === "Delivered" || status === "Out for Delivery") {
+      alert("Cannot delete a booking that is Delivered or Out for Delivery.");
+      return;
+    }
+    if (!window.confirm("Are you sure you want to delete this booking?")) return;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/booking/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadBookings();
+      } else {
+        alert(data.message || "Delete failed.");
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("Delete failed. Make sure the backend is running.");
+    }
+  };
+
   const createBooking = async () => {
     const payload = {
       senderName: form.senderName.trim(),
@@ -171,6 +194,7 @@ function Booking() {
           outline: none;
           transition: 0.2s ease;
           background: #fff;
+          box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -273,6 +297,28 @@ function Booking() {
           text-align: center;
           color: #6b7280;
           padding: 18px 0 6px;
+        }
+
+        .delete-btn {
+          padding: 6px 14px;
+          background: #e53935;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 600;
+          transition: background 0.2s ease;
+        }
+
+        .delete-btn:hover:not(:disabled) {
+          background: #c62828;
+        }
+
+        .delete-btn:disabled {
+          background: #e5e7eb;
+          color: #9ca3af;
+          cursor: not-allowed;
         }
 
         @media (max-width: 768px) {
@@ -418,6 +464,7 @@ function Booking() {
                         <th>Origin</th>
                         <th>Destination</th>
                         <th>Status</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -429,6 +476,26 @@ function Booking() {
                           <td>{booking.originCity}</td>
                           <td>{booking.destinationCity}</td>
                           <td>{booking.status}</td>
+                          <td>
+                            <button
+                              className="delete-btn"
+                              onClick={() =>
+                                handleDelete(booking._id, booking.status)
+                              }
+                              disabled={
+                                booking.status === "Delivered" ||
+                                booking.status === "Out for Delivery"
+                              }
+                              title={
+                                booking.status === "Delivered" ||
+                                booking.status === "Out for Delivery"
+                                  ? "Cannot delete this booking"
+                                  : "Delete booking"
+                              }
+                            >
+                              Delete
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

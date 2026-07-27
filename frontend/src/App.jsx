@@ -1,4 +1,4 @@
-// deploy trigger
+// deploy trigger 2
 import { Routes, Route } from "react-router-dom";
 import Payment from "./pages/Payment";
 import Auth from "./pages/Auth";

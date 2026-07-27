@@ -1,3 +1,4 @@
+// deploy trigger
 import { Routes, Route } from "react-router-dom";
 import Payment from "./pages/Payment";
 import Auth from "./pages/Auth";
@@ -6,7 +7,6 @@ import Booking from "./pages/Booking";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import Support from "./pages/Support";
-
 function App() {
   return (
     <Routes>
@@ -20,5 +20,4 @@ function App() {
     </Routes>
   );
 }
-
 export default App;
